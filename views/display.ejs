@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Display Data</title>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid gainsboro;
+            align-items: center;
+        }
+
+        body {
+            background-color: black;
+            width: 100%;
+            color: white;
+        }
+
+        th {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>DATAS OF PROFESSIONAL EMPLOYEES</h1>
+
+    <div>
+        <form action="/submit" method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required><br><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+            <label for="id">Id</label>
+            <input type="text" id="id" name="id"><br><br>
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required><br><br>
+            <button type="submit"  style="margin-bottom: 20px; margin-left: 100px;" >Submit</button>
+        </form>
+    </div>
+
+    <div>
+        <table style="width: 80%; font-size: 20px;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Age</th>
+                </tr>
+            </thead>
+            <tbody id="data-container" style="width: 100%; font-size: 20px;">
+                <% data.forEach(function(item) { %>
+                    <tr>
+                        <td>
+                            <%= item.name %>
+                        </td>
+                        <td>
+                            <%= item.email %>
+                        </td>
+                        <td>
+                            <%= item.age %>
+                        </td>
+                        <td style="display: none;">
+                            <%= item.id %>
+                        </td>
+                        <td>
+                            <button
+                                style="width: 45px; height: 30px; color: whitesmoke;  background-color: blue; border: 2px solid white;"
+                                onclick="edit('<%= item.id %>','<%= item.name %>', '<%= item.email %>', '<%= item.age %>')">Edit</button>
+                        </td>
+                        <td>
+                            <button
+                                style="width: 65px; height: 30px; color: black; background-color: red; border: 2px solid white;"
+                                onclick="remove('<%= item.name %>')">Delete</button>
+                        </td>
+                    </tr>
+
+                    <% }); %>
+
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function edit(id, name, email, age) {
+
+            const nameCell = document.createElement("td");
+            nameCell.innerHTML = `<input type="text" id="namee" name="name" value="${name}">`;
+
+            const emailCell = document.createElement("td");
+            emailCell.innerHTML = `<input type="email" id="emaill" name="email" value="${email}">`;
+
+            const ageCell = document.createElement("td");
+            ageCell.innerHTML = `<input type="number" id="agee" name="age" value="${age}">`;
+
+            const ido = document.createElement("td");
+            ido.innerHTML = `<input type="id" id="idd" name="id" value="${id}">`;
+            ido.style.display = "none";
+
+
+
+            const saveCell = document.createElement("td");
+            saveCell.innerHTML = `<button style="width: 45px; height: 30px;  color: white; background-color: green; border: 2px solid white;">Save</button>`;
+
+            saveCell.addEventListener('click', function () {
+
+                let selectedname = document.getElementById("namee").value;
+                let selectedemail = document.getElementById("emaill").value;
+                let selectedage = document.getElementById("agee").value;
+                const ido = document.getElementById("idd").value;
+                editAction(ido, selectedname, selectedemail, selectedage)
+            })
+
+
+            const row = document.activeElement.parentNode.parentNode;
+            row.innerHTML = '';
+            row.appendChild(nameCell);
+            row.appendChild(emailCell);
+            row.appendChild(ageCell);
+            row.appendChild(saveCell);
+            row.appendChild(ido);
+        }
+
+
+
+
+
+
+
+
+        function editAction(ido, name, email, age) {
+            console.log(ido);
+            console.log(name);
+            const formData = new URLSearchParams();
+            formData.append('name', name);
+            formData.append('email', email);
+            formData.append('age', age);
+            formData.append('id', ido);
+
+            fetch(`/update/${ido}`, {
+                method: 'PUT',
+                body: formData,
+            })
+
+
+                .then(response => {
+                    if (response.ok) {
+
+                        console.log('Data updated successfully');
+                        window.location.href = "/"
+                    } else {
+                        console.error('Failed to update data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+
+
+
+        function remove(id) {
+            console.log("dhfjhfhj")
+
+            fetch(`/delete/${id}`, {
+                method: 'DELETE',
+            })
+                .then(response => {
+                    if (response.ok) {
+
+                        console.log('Data deleted successfully');
+                        window.location.href = "/"
+                    } else {
+                        console.error('Failed to delete data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+    </script>
+</body>
+
+</html>
